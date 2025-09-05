@@ -226,7 +226,9 @@ class AudioDiffusion1D(nn.Module):
         whisper_path=None,
         uncondition=True,
         fine_decoder=False,
-        is_train = False
+        is_train = False,
+        wav_lm_path = None,
+        music_ssl_mudule_path = 'modules/our_MERT_BESTRQ/mert_fairseq'
     ):
         super().__init__()
         self.unet_model_name = unet_model_name
@@ -246,11 +248,11 @@ class AudioDiffusion1D(nn.Module):
         self.wavlm_fea_dim = 768
         for param in self.whisper_encoder.parameters():
             param.requires_grad = False
-        self.wavlm_encoder = AutoModel.from_pretrained("ckpts/wavlm")
+        self.wavlm_encoder = AutoModel.from_pretrained(wave_lm_path)
         self.wavlm_transfer = torchaudio.transforms.Resample(24000, 16000)
         for param in self.wavlm_encoder.parameters():
             param.requires_grad = False
-        self.pretrained_model = BESTRQ_Model(model_dir = 'modules/our_MERT_BESTRQ/mert_fairseq', 
+        self.pretrained_model = BESTRQ_Model(model_dir = music_ssl_mudule_path, 
                                 checkpoint_dir = best_rq_ckpt, output_features = features_type, layers = [4, 11])
         for v in self.pretrained_model.parameters():
             v.requires_grad = False 

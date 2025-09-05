@@ -37,4 +37,7 @@ pip install tensorboard
 pip install humanfriendly
 ```
 
+## Acknowledgement
+
+Part of the code refers to MuCodec (https://github.com/tencent-ailab/MuCodec). 
 

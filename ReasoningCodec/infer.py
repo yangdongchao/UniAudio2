@@ -74,7 +74,7 @@ class VolumeNorm(nn.Module):
 
 
 class SemanticTokenizer(nn.Module):
-    def __init__(self, model_path='', train_config=None, load_main_model=True, device="cpu"):
+    def __init__(self, model_path='', music_ssl_mudule_path, train_config=None, load_main_model=True, device="cpu"):
         super(SemanticTokenizer, self).__init__()
         self.sample_rate = 24000
         self.device = device
@@ -105,6 +105,8 @@ class SemanticTokenizer(nn.Module):
             prompt_path = train_config.prompt_path,
             uncondition = True,
             fine_decoder =  train_config.fine_decoder,
+            wav_lm_path = train_config.wav_lm_path,
+            music_ssl_mudule_path = music_ssl_mudule_path
         )
         state_dict = torch.load(model_path, map_location='cpu')['model']
         state_dict = { k.split("module.")[-1] if k.startswith("module.") else k: v
@@ -382,6 +384,7 @@ def get_parser():
     parser.add_argument('--rank', type=int, default=-1, help='GPU rank. -1 means CPU')
     # data related
     parser.add_argument('--output_dir', type=str, help="tag for decoding")
+    parser.add_argument('--music_ssl_mudule_path', type=str, help="tag for decoding")
     parser.add_argument('--input_dir', type=str, help="the audio folder path")
     return parser 
 
@@ -402,7 +405,7 @@ if __name__ == '__main__':
     else:
         device = torch.device('cpu')
     
-    tokenizer = SemanticTokenizer(model_path=args.resume, train_config=train_args, device=device)
+    tokenizer = SemanticTokenizer(model_path=args.resume, music_ssl_mudule_path=args.music_ssl_mudule_path, train_config=train_args, device=device)
     wav_path = args.input_dir
     save_path = args.output_dir
     import os 
