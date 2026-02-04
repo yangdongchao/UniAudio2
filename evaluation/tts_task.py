@@ -1,10 +1,5 @@
 # build the TTS task evlaution set
-# (1) without the audio timbre prompt
-# (2) using the audio timbre prompt
 
-# 测试集: 
-# - (libriTTS test clean)
-# - seedtts-eval (主要用这个？)
 
 from dataclasses import dataclass
 from typing import List, Tuple

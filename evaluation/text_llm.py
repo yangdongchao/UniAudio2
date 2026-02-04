@@ -109,12 +109,6 @@ def get_log_likelihood_choice(model: Model_stage3, tokenizer: Any, context: str,
 
     # --- 3. Logits 和标签处理 ---
     
-    # Logits 的形状是 (1, Sequence_Length, Vocab_Size)
-    # 确定续写对应的 Logits (从 context 结束后的第一个 token 的预测开始)
-    # Logits 对应 input_ids[:-1]
-    #print('text_logits ', text_logits.shape)
-    # Logits 对应预测的 token 从 index=1 开始
-    # 续写 Logits 从 (continuation_start_index - 1) 处开始计算
     shift_logits = text_logits[:, continuation_start_index-1:-1, :].contiguous()
     
     # 续写标签 (从 input_ids 的 continuation_start_index 处开始)
@@ -123,9 +117,6 @@ def get_log_likelihood_choice(model: Model_stage3, tokenizer: Any, context: str,
     # --- 4. 计算总对数似然 (LL) ---
     log_probs = torch.nn.functional.log_softmax(shift_logits.squeeze(0), dim=-1)
     
-    # print('shift_logits ', shift_logits.shape)
-    # print('shift_labels ', shift_labels.shape)
-    # 提取每个目标 token 的对数概率
     target_log_probs = log_probs.gather(1, shift_labels.squeeze(0).unsqueeze(1)).squeeze(1)
     
     # 返回总对数似然 (求和)
@@ -161,9 +152,6 @@ def run_mmlu_evaluation(model, tokenizer, subtask, max_ctx_len, device):
             true_answer_index = example['answerKey']
         
         # Zero-shot Prompt 格式 (注意：这可能需要根据您的 LLM 实际训练格式调整)
-        # print('question ', question)
-        # print('choices ', choices)
-        # assert 1==2
         prompt_context = f"{question}\n\nA. {choices[0]}\nB. {choices[1]}\nC. {choices[2]}\nD. {choices[3]}\n\nAnswer:"
         
         log_likelihoods = []

@@ -1,8 +1,6 @@
 # build the music/audio generation task evlaution set
 
-# 测试集: 
-# - MusicCaps
-# - AudioCaps
+
 
 from dataclasses import dataclass
 from typing import List, Tuple

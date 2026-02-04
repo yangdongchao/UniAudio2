@@ -345,19 +345,7 @@ if __name__ == '__main__':
     os.makedirs(args.output_dir, exist_ok=True)
     ### tmp code   ###
     data_content = read_json(args.test_data_json)
-    #text_dict = torch.load(data_content['keys']['text_seq'], map_location='cpu')
-    #cnt = 0
-    # f_out = open(f"{args.output_dir}/results.txt", 'w')
-    # for key in text_dict.keys():
-    #     cnt += 1
-    #     tmp_text = text_dict[key]
-    #     gt_text = generator._text_tokenizer.decode(tmp_text)
-        
-    #     text_content = generator.generate_text(task_name=data_content['task'], task_prompt = tmp_text,
-    #                                 temperature = args.temperature, topk = args.topk, cfg_scale=args.cfg_scale)
-    #     f_out.write(key+'\t'+gt_text+'\t'+text_content+'\n')
-
-    tmp_prompt = '你了解音乐生成嘛 '
+    tmp_prompt = ''
     text_content = generator.generate_text(task_prompt = tmp_prompt,
                                      temperature = args.temperature, 
                                      topk = args.topk, cfg_scale=args.cfg_scale)

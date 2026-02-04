@@ -1,5 +1,3 @@
-# build the few-shot generation task evaluation code
-# Note that, for the few-shot task generation, we donot use the cfg
 
 from dataclasses import dataclass
 from typing import List, Tuple

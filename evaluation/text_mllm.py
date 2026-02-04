@@ -62,9 +62,7 @@ def prepare_text_input_for_stage3(token_ids: torch.Tensor, num_cb: int, device: 
 
     # --- 5. input_pos (B, S) ---
     input_pos = torch.arange(S, dtype=torch.long, device=device).unsqueeze(0).repeat(B, 1)
-    # print('tokens ', tokens.shape)
-    # print('labels ', labels.shape)
-    # print('tokens_mask ', tokens_mask.shape)
+
     return {
         'tokens': tokens,
         'labels': labels,
@@ -84,22 +82,11 @@ def get_log_likelihood_choice(model: Model_stage3, tokenizer: Any, context: str,
     
     # Tokenize 完整文本 (Context + Continuation)
     full_text = context + ' ' + continuation
-    #print('full_text ', type(full_text))
-    # print('context ', context)
-    # print('continuation ', full_text)
-    # assert 1==2
     tokenized = tokenizer.tokenize(full_text)[:-1]
     input_ids = torch.tensor(tokenized).to(device).unsqueeze(0)
-    #print('input_ids ', input_ids)
-    #input_ids = tokenized.input_ids.to(model.device)
-    
-    # 计算 context 的长度 (用于确定续写 LL 的起始点)
     context_token_ids = tokenizer.tokenize(context)[:-1]
     context_token_ids = torch.tensor(context_token_ids).to(device).unsqueeze(0)
     continuation_start_index = context_token_ids.size(1) 
-    # print('context_token_ids ', context_token_ids)
-    # assert 1==2
-    # 准备适配器输入 (B=1)
     inputs = prepare_text_input_for_stage3(input_ids, model.config.audio_num_codebooks, device, max_length)
     
     # --- 2. 模型前向传播 ---
@@ -109,12 +96,6 @@ def get_log_likelihood_choice(model: Model_stage3, tokenizer: Any, context: str,
 
     # --- 3. Logits 和标签处理 ---
     
-    # Logits 的形状是 (1, Sequence_Length, Vocab_Size)
-    # 确定续写对应的 Logits (从 context 结束后的第一个 token 的预测开始)
-    # Logits 对应 input_ids[:-1]
-    #print('text_logits ', text_logits.shape)
-    # Logits 对应预测的 token 从 index=1 开始
-    # 续写 Logits 从 (continuation_start_index - 1) 处开始计算
     shift_logits = text_logits[:, continuation_start_index-1:-1, :].contiguous()
     
     # 续写标签 (从 input_ids 的 continuation_start_index 处开始)
@@ -123,9 +104,6 @@ def get_log_likelihood_choice(model: Model_stage3, tokenizer: Any, context: str,
     # --- 4. 计算总对数似然 (LL) ---
     log_probs = torch.nn.functional.log_softmax(shift_logits.squeeze(0), dim=-1)
     
-    # print('shift_logits ', shift_logits.shape)
-    # print('shift_labels ', shift_labels.shape)
-    # 提取每个目标 token 的对数概率
     target_log_probs = log_probs.gather(1, shift_labels.squeeze(0).unsqueeze(1)).squeeze(1)
     
     # 返回总对数似然 (求和)
@@ -172,12 +150,7 @@ def run_mmlu_evaluation(model, tokenizer, subtask, max_ctx_len, device):
             # try:
             ll = get_log_likelihood_choice(model, tokenizer, prompt_context, continuation, max_ctx_len, device)
             log_likelihoods.append(ll)
-            # except Exception as e:
-            #     # 捕获可能的 Tokenizer 或模型输入错误，跳过该样本
-            #     print(f"  Warning: Skipping sample due to error: {e}")
-            #     log_likelihoods.append(-float('inf')) # 确保跳过的样本不会被选为最佳答案
-        
-        # 找到对数似然最高的选项
+
         predicted_answer_index = log_likelihoods.index(max(log_likelihoods))
         
         # 计分

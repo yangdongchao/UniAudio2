@@ -11,16 +11,7 @@ from datasets import load_dataset
 from transformers import AutoModelForCausalLM, AutoTokenizer, AutoConfig, PreTrainedModel
 
 # ==============================================================================
-# 0. 占位符/依赖导入 (假设这些在您的环境中可用)
-# ------------------------------------------------------------------------------
-# 假设这些类和函数在您的 'llm_models.model_new' 和 'llm_utils' 中
-# 请确保这些导入路径与您的实际项目结构匹配
-# from llm_models.model_new import Model, Model_stage1, ModelArgs, Model_stage2, Model_stage3
-# from tools.tokenizer.Text2ID.text_tokenizer import TextTokenizer
-# from llm_utils.arguments import str2bool
-# from llm_utils.train_utils import resume_for_inference
 
-# 为了让代码可以运行，我将使用占位符或简化的定义：
 @dataclass
 class ModelArgs:
     decoder_name: str = 'llama'
@@ -154,11 +145,7 @@ def get_log_likelihood_choice(model: PreTrainedModel, tokenizer: Any, context: s
     # print('shift_labels ', shift_labels)
     # print('shift_logits ', shift_logits.shape)
     # print('shift_labels ', shift_labels.shape)
-    # 再次检查长度，如果 Logits 和 Labels 长度不匹配则返回负无穷
-    # if shift_logits.size(1) != shift_labels.size(1):
-    #     # 调试信息: 告知用户切片可能出了问题 (特别是对于非标准分词器)
-    #     print(f"❌ LL Failure: Logits {shift_logits.size(1)} != Labels {shift_labels.size(1)}")
-    #     return -float('inf')
+    
 
     # --- 4. 计算总对数似然 (LL) ---
     log_probs = torch.nn.functional.log_softmax(shift_logits.squeeze(0), dim=-1)
@@ -252,7 +239,7 @@ if __name__ == '__main__':
     # ⚠️ 1. Llama 3B 模型配置 (用于验证)
     LLAMA_MODEL_NAME = "exp/ckpts/Llama-3.2-3B" # 使用 Llama 3 8B 作为可下载的标准验证模型
     EVAL_SUBTASK = "all" # 快速测试单个子任务
-    MAX_CONTEXT_LENGTH = 1024 
+    MAX_CONTEXT_LENGTH = 2048 
     
     
     # Llama 验证模式
