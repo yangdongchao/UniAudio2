@@ -26,11 +26,11 @@ from llm_models.semantic_decoder import Decoder, FiLMEncoder
 def select_with_fixed_mask(x: torch.Tensor, mask: torch.Tensor, k: int) -> torch.Tensor:
     """
     Args:
-        x: (B, T) 输入张量
-        mask: (B, T) 掩码张量（每行恰好有k个1）
-        k: 每行选中的元素数量
+        x: (B, T) input tensor
+        mask: (B, T) mask tensor (exactly k ones per row)
+        k: number of selected elements per row
     Returns:
-        (B, k) 选中元素组成的张量
+        (B, k) tensor of selected elements
     """
     indices = torch.nonzero(mask, as_tuple=True)[1].reshape(-1, k)
     return x.gather(1, indices)
@@ -93,8 +93,8 @@ def CrossEntropyAndAccuracy_residual(logits, y, loss_mask, loss_weights=[1, 1, 1
 
         tmp_loss = tmp_loss*loss_mask[:,idx] # add loss mask
         
-        tmp_pred = tmp_logit.argmax(1) # 
-        tmp_num_all_tokens = tmp_y.shape[0] # we only calculate the non-mask part
+        tmp_pred = tmp_logit.argmax(1)
+        tmp_num_all_tokens = tmp_y.shape[0]  # we only calculate the non-mask part
     
         tmp_acc_tk = tmp_pred.eq(tmp_y).int().sum()
         acc[f'acc_{idx+1}'] = tmp_acc_tk/tmp_num_all_tokens
@@ -170,11 +170,11 @@ def audio_sample_topk(logits: torch.Tensor, topk: int, temperature: float, forbi
     vocab_size = logits.size(-1)
     if forbid_prefix >= vocab_size:
         raise ValueError("forbid_prefix must be smaller than vocab size")
-    # 禁止前 forbid_prefix 个位置：置为 -inf
+    # Set first forbid_prefix positions to -inf (forbidden)
     if forbid_prefix > 0:
-        # 兼容任意 batch 维度
+        # Works with arbitrary batch dimensions
         logits[..., :forbid_prefix] = float("-inf")
-    # 确保 topk 不超过可选 token 数
+    # Ensure topk does not exceed number of valid tokens
     effective_vocab = vocab_size - forbid_prefix
     if topk <= 0 or topk > effective_vocab:
         raise ValueError(f"topk must be in 1..{effective_vocab} given forbid_prefix={forbid_prefix}")
@@ -231,18 +231,17 @@ class Model(
         b, s, _ = tokens.size()
 
         embeds = self._embed_tokens(tokens)
-        masked_embeds = embeds * tokens_mask[:,:-1,:].unsqueeze(-1) # 
-        h = masked_embeds.sum(dim=2) # merge
+        masked_embeds = embeds * tokens_mask[:,:-1,:].unsqueeze(-1)
+        h = masked_embeds.sum(dim=2)  # merge streams
         
         h = self.backbone(h, input_pos=input_pos)
         text_logits = self.backbone.lm_head(h)
 
-        audio_local_embed = self._embed_local_audio(labels[:,:,:-1]) # remove the text streaming and the last VQ layer
-        # forward local
-        curr_h = torch.cat([h.unsqueeze(2), audio_local_embed], dim=2) # B, seq_len, audio_num_codebooks, D
-        curr_h = curr_h[tokens_mask[:,1:,0].bool()] # transfer to (N, audio_num_codebooks, D). 只关心audio streaming
+        audio_local_embed = self._embed_local_audio(labels[:,:,:-1])  # remove text stream and last VQ layer
+        curr_h = torch.cat([h.unsqueeze(2), audio_local_embed], dim=2)  # (B, seq_len, audio_num_codebooks, D)
+        curr_h = curr_h[tokens_mask[:,1:,0].bool()]  # (N, audio_num_codebooks, D); only audio steps
         choosed_label = labels[tokens_mask[:,1:,0].bool()]
-        choosed_mask = loss_mask[:,1:,:][tokens_mask[:,1:,0].bool()] # 
+        choosed_mask = loss_mask[:,1:,:][tokens_mask[:,1:,0].bool()]
         decoder_h = self.decoder(self.projection(curr_h)) # B, N, D
         ci_logits = torch.einsum("bsd,sdv->bsv", decoder_h, self.audio_head)
         return text_logits, ci_logits, choosed_label, choosed_mask
@@ -279,8 +278,8 @@ class Model(
         dtype = next(self.parameters()).dtype
         b, s, _ = tokens.size()
         embeds = self._embed_tokens(tokens)
-        masked_embeds = embeds * tokens_mask.unsqueeze(-1) # 
-        h = masked_embeds.sum(dim=2) # merge
+        masked_embeds = embeds * tokens_mask.unsqueeze(-1)
+        h = masked_embeds.sum(dim=2)  # merge streams
         h = self.backbone(h, input_pos=input_pos, input_pos_maxp1=input_pos_maxp1).to(dtype=dtype)
         last_h = h[:, -1, :] # the last frame
         text_logits = self.backbone.lm_head(last_h)
@@ -337,8 +336,7 @@ class Model_stage3(
     PyTorchModelHubMixin,
     pipeline_tag="Text-Audio Foundation Models",
 ):
-    ''' stage 3  text-audio pre-training
-    '''
+    """Stage 3: text-audio joint pre-training."""
     def __init__(self, config: ModelArgs):
         super().__init__()
         self.config = config
@@ -357,9 +355,9 @@ class Model_stage3(
         self.audio_generation_expert, _ = _prepare_transformer(GPT(audio_generation_expert_config))
     
     def load_from_stage2_checkpoint(self, checkpoint_path):
-        """从stage2的checkpoint加载权重"""
+        """Load weights from a Stage2 checkpoint into this Stage3 model."""
         print("=" * 80)
-        print("从Stage2模型初始化Stage3模型")
+        print("Initializing Stage3 from Stage2 checkpoint")
         print("=" * 80)
         try:
             checkpoint = torch.load(checkpoint_path, map_location='cpu')
@@ -371,40 +369,34 @@ class Model_stage3(
                 stage2_state_dict = checkpoint['state_dict']
             else:
                 stage2_state_dict = checkpoint
-            print(f"Stage2 checkpoint加载成功，包含 {len(stage2_state_dict)} 个参数")
-            # 获取当前模型的state_dict
+            print(f"Stage2 checkpoint loaded: {len(stage2_state_dict)} parameters")
             current_state_dict = self.state_dict()
-            # 统计加载情况
             loaded_count = 0
             skipped_count = 0
             shape_mismatch_count = 0
-            print("\n开始参数初始化...")
+            print("\nInitializing parameters...")
             for name, param in current_state_dict.items():
                 if name in stage2_state_dict:
                     stage1_param = stage2_state_dict[name]
                     if stage1_param.shape == param.shape:
                         param.data.copy_(stage1_param)
                         loaded_count += 1
-                        #print(f"  ✅ {name}: 加载成功")
                     else:
                         shape_mismatch_count += 1
-                        #print(f"  ⚠️ {name}: 形状不匹配 - Stage1: {stage1_param.shape}, Stage2: {param.shape}")
                 else:
                     skipped_count += 1
-                    #print(f"  🔶 {name}: Stage2中不存在，使用随机初始化")
-            # 打印统计信息
             print("\n" + "=" * 80)
-            print("参数初始化统计:")
-            print(f"  成功加载: {loaded_count}")
-            print(f"  形状不匹配: {shape_mismatch_count}")
-            print(f"  跳过（新参数）: {skipped_count}")
-            print(f"  总参数: {len(current_state_dict)}")
-            print(f"  加载比例: {loaded_count/len(current_state_dict)*100:.1f}%")
+            print("Parameter initialization summary:")
+            print(f"  Loaded: {loaded_count}")
+            print(f"  Shape mismatch: {shape_mismatch_count}")
+            print(f"  Skipped (new): {skipped_count}")
+            print(f"  Total: {len(current_state_dict)}")
+            print(f"  Load ratio: {loaded_count/len(current_state_dict)*100:.1f}%")
             print("=" * 80)
             del checkpoint
-            
+
         except Exception as e:
-            print(f"❌ 加载Stage2 checkpoint失败: {e}")
+            print(f"Failed to load Stage2 checkpoint: {e}")
             raise
     
     def forward(self, tokens: torch.Tensor, labels: torch.Tensor, 
@@ -417,7 +409,7 @@ class Model_stage3(
             input_pos: (B, S)
         Returns:
             text_logits: (B, S, vocab_text)
-            ci_logits:   (N, audio_num_codebooks, audio_vocab)   # N 为被挑选的音频步数之和
+            ci_logits:   (N, audio_num_codebooks, audio_vocab)   # N = total selected audio steps
             choosed_label: (N, audio_num_codebooks)
             choosed_mask:  (N, audio_num_codebooks)
         """
@@ -425,51 +417,39 @@ class Model_stage3(
         device = tokens.device
         B, S, _ = tokens.size()
 
-        # 1) 取出各流嵌入：最后一流是文本，其余是音频 codebooks
-        # audio_stream_embeds: (B, S, audio_num_codebooks, D)
-        audio_stream_embeds = self._embed_audio_tokens(tokens)
+        # 1) Embed each stream: last stream is text, rest are audio codebooks
+        audio_stream_embeds = self._embed_audio_tokens(tokens)  # (B, S, audio_num_codebooks, D)
 
-        # 掩码准备
-        # audio_step_mask: (B, S, 1) — 为1的位置代表 “音频帧”
-        audio_step_mask = tokens_mask[:, :-1, 0].unsqueeze(-1).to(dtype=dtype)
-        # text_step_mask: (B, S, 1) — 该时间步为“文本帧”
-        text_step_mask = tokens_mask[:, :-1, -1].unsqueeze(-1).to(dtype=dtype)
+        # Mask setup: 1 = audio step, 1 = text step
+        audio_step_mask = tokens_mask[:, :-1, 0].unsqueeze(-1).to(dtype=dtype)   # (B, S, 1)
+        text_step_mask = tokens_mask[:, :-1, -1].unsqueeze(-1).to(dtype=dtype)  # (B, S, 1)
 
-        # 2) audio experts：仅用音频流（不含文本流）构造输入并因果建模
-        # audio_stream_mask: (B, S, audio_num_codebooks, 1)
+        # 2) Audio expert input: fuse codebooks per timestep (text positions are masked in data)
         audio_stream_mask = tokens_mask[:, :-1, :-1].unsqueeze(-1).to(dtype=dtype)
+        audio_input = (audio_stream_embeds * audio_stream_mask).sum(dim=2)  # (B, S, D)
 
-        # 将当前时间步的各个 codebook 融合成一个向量作为专家输入
-        # audio_input: (B, S, D)
-        audio_input = (audio_stream_embeds * audio_stream_mask).sum(dim=2) # 数据里面，对应text token的部分，会被mask
+        h_audio = self.audio_understanding_expert(audio_input)  # (B, S, D)
 
-        # 仅音频帧应产生有效输出；非音频帧输入为 0，但仍走因果堆叠（简单稳妥）
-        h_audio = self.audio_understanding_expert(audio_input) # input_pos=input_pos, input_pos_maxp1=input_pos_maxp1  # (B, S, D)
+        # 3) Text embeddings (not fed to audio expert)
+        text_embeds = self.backbone.transformer.wte(tokens[:, :, -1])  # (B, S, D_backbone)
 
-        # 3) 文本帧的嵌入（不进入音频专家）
-        # text_embeds: (B, S, D_backbone)
-        text_embeds = self.backbone.transformer.wte(tokens[:, :, -1])
-
-        # 4) 重组统一序列作为 backbone 输入：
-        #    音频帧 -> 用音频专家输出；文本帧 -> 用文本嵌入；其余（padding）为 0
+        # 4) Build unified backbone input: audio steps = expert output, text steps = text embed, padding = 0
         backbone_input = h_audio * audio_step_mask + text_embeds * text_step_mask  # (B, S, D)
 
-        # 5) 进入统一 LLM backbone
-        h = self.backbone(backbone_input, input_pos=input_pos) # input_pos_maxp1=input_pos_maxp1            # (B, S, D)
-        
-        # 进入 audio generation expert
-        generation_input = h * audio_step_mask  
-        h_audio = self.audio_generation_expert(generation_input) # input_pos=input_pos, input_pos_maxp1=input_pos_maxp1
-        h_final = h_audio*audio_step_mask + h*text_step_mask # recover the text features
+        # 5) Unified LLM backbone
+        h = self.backbone(backbone_input, input_pos=input_pos)  # (B, S, D)
+
+        generation_input = h * audio_step_mask
+        h_audio = self.audio_generation_expert(generation_input)
+        h_final = h_audio * audio_step_mask + h * text_step_mask  # recover text features
         text_logits = self.backbone.lm_head(h_final)                            # (B, S, V_text)
 
-        audio_local_embed = self._embed_local_audio(labels[:,:,:-1]) # remove the text streaming and the last VQ layer
-        # forward local
-        curr_h = torch.cat([h_final.unsqueeze(2), audio_local_embed], dim=2) # B, seq_len, audio_num_codebooks, D
-        curr_h = curr_h[tokens_mask[:,1:,0].bool()] # transfer to (N, audio_num_codebooks, D). 只关心audio streaming
+        audio_local_embed = self._embed_local_audio(labels[:,:,:-1])  # drop text stream and last VQ layer
+        curr_h = torch.cat([h_final.unsqueeze(2), audio_local_embed], dim=2)  # (B, S, audio_num_codebooks, D)
+        curr_h = curr_h[tokens_mask[:,1:,0].bool()]  # (N, audio_num_codebooks, D); only audio steps
         choosed_label = labels[tokens_mask[:,1:,0].bool()]
-        choosed_mask = loss_mask[:,1:,:][tokens_mask[:,1:,0].bool()] # 
-        decoder_h = self.decoder(self.projection(curr_h)) # B, N, D
+        choosed_mask = loss_mask[:,1:,:][tokens_mask[:,1:,0].bool()]
+        decoder_h = self.decoder(self.projection(curr_h))  # (B, N, D)
         ci_logits = torch.einsum("bsd,sdv->bsv", decoder_h, self.audio_head)
         return text_logits, ci_logits, choosed_label, choosed_mask
 
@@ -483,7 +463,7 @@ class Model_stage3(
             input_pos: (B, S)
         Returns:
             text_logits: (B, S, vocab_text)
-            ci_logits:   (N, audio_num_codebooks, audio_vocab)   # N 为被挑选的音频步数之和
+            ci_logits:   (N, audio_num_codebooks, audio_vocab)   # N = total selected audio steps
             choosed_label: (N, audio_num_codebooks)
             choosed_mask:  (N, audio_num_codebooks)
         """
@@ -491,51 +471,38 @@ class Model_stage3(
         device = tokens.device
         B, S, _ = tokens.size()
 
-        # 1) 取出各流嵌入：最后一流是文本，其余是音频 codebooks
-        # audio_stream_embeds: (B, S, audio_num_codebooks, D)
-        audio_stream_embeds = self._embed_audio_tokens(tokens)
+        # 1) Embed each stream: last stream is text, rest are audio codebooks
+        audio_stream_embeds = self._embed_audio_tokens(tokens)  # (B, S, audio_num_codebooks, D)
 
-        # 掩码准备
-        # audio_step_mask: (B, S, 1) — 为1的位置代表 “音频帧”
-        audio_step_mask = tokens_mask[:, :-1, 0].unsqueeze(-1).to(dtype=dtype)
-        # text_step_mask: (B, S, 1) — 该时间步为“文本帧”
-        text_step_mask = tokens_mask[:, :-1, -1].unsqueeze(-1).to(dtype=dtype)
+        audio_step_mask = tokens_mask[:, :-1, 0].unsqueeze(-1).to(dtype=dtype)   # (B, S, 1)
+        text_step_mask = tokens_mask[:, :-1, -1].unsqueeze(-1).to(dtype=dtype)  # (B, S, 1)
 
-        # 2) audio experts：仅用音频流（不含文本流）构造输入并因果建模
-        # audio_stream_mask: (B, S, audio_num_codebooks, 1)
+        # 2) Audio expert: fuse codebooks per timestep (text positions masked in data)
         audio_stream_mask = tokens_mask[:, :-1, :-1].unsqueeze(-1).to(dtype=dtype)
+        audio_input = (audio_stream_embeds * audio_stream_mask).sum(dim=2)  # (B, S, D)
 
-        # 将当前时间步的各个 codebook 融合成一个向量作为专家输入
-        # audio_input: (B, S, D)
-        audio_input = (audio_stream_embeds * audio_stream_mask).sum(dim=2) # 数据里面，对应text token的部分，会被mask
-
-        # 仅音频帧应产生有效输出；非音频帧输入为 0，但仍走因果堆叠（简单稳妥）
         h_audio = self.audio_understanding_expert(audio_input, input_pos=input_pos, input_pos_maxp1=input_pos_maxp1)  # (B, S, D)
 
-        # 3) 文本帧的嵌入（不进入音频专家）
-        # text_embeds: (B, S, D_backbone)
-        text_embeds = self.backbone.transformer.wte(tokens[:, :, -1])
+        # 3) Text embeddings (not fed to audio expert)
+        text_embeds = self.backbone.transformer.wte(tokens[:, :, -1])  # (B, S, D_backbone)
 
-        # 4) 重组统一序列作为 backbone 输入：
-        #    音频帧 -> 用音频专家输出；文本帧 -> 用文本嵌入；其余（padding）为 0
+        # 4) Unified backbone input: audio steps = expert output, text = embed, padding = 0
         backbone_input = h_audio * audio_step_mask + text_embeds * text_step_mask  # (B, S, D)
 
-        # 5) 进入统一 LLM backbone
-        h = self.backbone(backbone_input, input_pos=input_pos, input_pos_maxp1=input_pos_maxp1)            # (B, S, D)
-        
-        # 进入 audio generation expert
-        generation_input = h * audio_step_mask  
+        # 5) LLM backbone
+        h = self.backbone(backbone_input, input_pos=input_pos, input_pos_maxp1=input_pos_maxp1)  # (B, S, D)
+
+        generation_input = h * audio_step_mask
         h_audio = self.audio_generation_expert(generation_input, input_pos=input_pos, input_pos_maxp1=input_pos_maxp1)
-        h_final = h_audio*audio_step_mask + h*text_step_mask # recover the text features
+        h_final = h_audio * audio_step_mask + h * text_step_mask  # recover text features
         text_logits = self.backbone.lm_head(h_final)                            # (B, S, V_text)
 
-        audio_local_embed = self._embed_local_audio(labels[:,:,:-1]) # remove the text streaming and the last VQ layer
-        # forward local
-        curr_h = torch.cat([h_final.unsqueeze(2), audio_local_embed], dim=2) # B, seq_len, audio_num_codebooks, D
-        curr_h = curr_h[tokens_mask[:,1:,0].bool()] # transfer to (N, audio_num_codebooks, D). 只关心audio streaming
+        audio_local_embed = self._embed_local_audio(labels[:,:,:-1])  # drop text stream and last VQ layer
+        curr_h = torch.cat([h_final.unsqueeze(2), audio_local_embed], dim=2)  # (B, S, audio_num_codebooks, D)
+        curr_h = curr_h[tokens_mask[:,1:,0].bool()]  # (N, audio_num_codebooks, D); only audio steps
         choosed_label = labels[tokens_mask[:,1:,0].bool()]
-        choosed_mask = loss_mask[:,1:,:][tokens_mask[:,1:,0].bool()] # 
-        decoder_h = self.decoder(self.projection(curr_h)) # B, N, D
+        choosed_mask = loss_mask[:,1:,:][tokens_mask[:,1:,0].bool()]
+        decoder_h = self.decoder(self.projection(curr_h))  # (B, N, D)
         ci_logits = torch.einsum("bsd,sdv->bsv", decoder_h, self.audio_head)
         return text_logits, ci_logits, choosed_label, choosed_mask
 
@@ -549,7 +516,7 @@ class Model_stage3(
             input_pos: (B, S)
         Returns:
             text_logits: (B, S, vocab_text)
-            ci_logits:   (N, audio_num_codebooks, audio_vocab)   # N 为被挑选的音频步数之和
+            ci_logits:   (N, audio_num_codebooks, audio_vocab)   # N = total selected audio steps
             choosed_label: (N, audio_num_codebooks)
             choosed_mask:  (N, audio_num_codebooks)
         """
@@ -557,42 +524,30 @@ class Model_stage3(
         device = tokens.device
         B, S, _ = tokens.size()
 
-        # 1) 取出各流嵌入：最后一流是文本，其余是音频 codebooks
-        # audio_stream_embeds: (B, S, audio_num_codebooks, D)
-        audio_stream_embeds = self._embed_audio_tokens(tokens)
+        # 1) Embed each stream: last stream is text, rest are audio codebooks
+        audio_stream_embeds = self._embed_audio_tokens(tokens)  # (B, S, audio_num_codebooks, D)
 
-        # 掩码准备
-        # audio_step_mask: (B, S, 1) — 为1的位置代表 “音频帧”
-        audio_step_mask = tokens_mask[:, :, 0].unsqueeze(-1).to(dtype=dtype)
-        # text_step_mask: (B, S, 1) — 该时间步为“文本帧”
-        text_step_mask = tokens_mask[:, :, -1].unsqueeze(-1).to(dtype=dtype)
+        audio_step_mask = tokens_mask[:, :, 0].unsqueeze(-1).to(dtype=dtype)   # (B, S, 1)
+        text_step_mask = tokens_mask[:, :, -1].unsqueeze(-1).to(dtype=dtype)  # (B, S, 1)
 
-        # 2) audio experts：仅用音频流（不含文本流）构造输入并因果建模
-        # audio_stream_mask: (B, S, audio_num_codebooks, 1)
+        # 2) Audio expert input (text positions masked in data)
         audio_stream_mask = tokens_mask[:, :, :-1].unsqueeze(-1).to(dtype=dtype)
+        audio_input = (audio_stream_embeds * audio_stream_mask).sum(dim=2)  # (B, S, D)
 
-        # 将当前时间步的各个 codebook 融合成一个向量作为专家输入
-        # audio_input: (B, S, D)
-        audio_input = (audio_stream_embeds * audio_stream_mask).sum(dim=2) # 数据里面，对应text token的部分，会被mask
-
-        # 仅音频帧应产生有效输出；非音频帧输入为 0，但仍走因果堆叠（简单稳妥）
         h_audio = self.audio_understanding_expert(audio_input)  # (B, S, D)
 
-        # 3) 文本帧的嵌入（不进入音频专家）
-        # text_embeds: (B, S, D_backbone)
-        text_embeds = self.backbone.transformer.wte(tokens[:, :, -1])
+        # 3) Text embeddings
+        text_embeds = self.backbone.transformer.wte(tokens[:, :, -1])  # (B, S, D_backbone)
 
-        # 4) 重组统一序列作为 backbone 输入：
-        #    音频帧 -> 用音频专家输出；文本帧 -> 用文本嵌入；其余（padding）为 0
+        # 4) Unified backbone input: audio = expert output, text = embed, padding = 0
         backbone_input = h_audio * audio_step_mask + text_embeds * text_step_mask  # (B, S, D)
 
-        # 5) 进入统一 LLM backbone
-        h = self.backbone(backbone_input)            # (B, S, D)
-        
-        # 进入 audio generation expert
-        generation_input = h * audio_step_mask  
+        # 5) LLM backbone
+        h = self.backbone(backbone_input)  # (B, S, D)
+
+        generation_input = h * audio_step_mask
         h_audio = self.audio_generation_expert(generation_input)
-        h_final = h_audio*audio_step_mask + h*text_step_mask # recover the text features
+        h_final = h_audio * audio_step_mask + h * text_step_mask  # recover text features
         text_logits = self.backbone.lm_head(h_final)  # (B, S, V_text)
         return text_logits 
 
@@ -604,7 +559,7 @@ class Model_stage3(
         with device:
             self.backbone.set_kv_cache(max_batch_size, max_seq_length=2048, device=device, dtype=dtype)
             self.decoder.set_kv_cache(max_batch_size, max_seq_length=self.config.audio_num_codebooks, device=device, dtype=dtype)
-            # Audio understanding expert (新增)
+            # Audio understanding expert
             self.audio_understanding_expert.set_kv_cache(max_batch_size, max_seq_length=2048, device=device, dtype=dtype)
             # Audio generation expert
             self.audio_generation_expert.set_kv_cache(max_batch_size, max_seq_length=2048, device=device, dtype=dtype)
@@ -635,35 +590,30 @@ class Model_stage3(
         num_cb = self.config.audio_num_codebooks
         assert C1 == num_cb + 1, "last stream must be text"
 
-        # --- 1) 构造“音频帧/文本帧”mask ---
+        # 1) Audio-step / text-step masks
         audio_step_mask = tokens_mask[:, :, 0].unsqueeze(-1).to(dtype=dtype)   # (B,S,1)
         text_step_mask  = tokens_mask[:, :, -1].unsqueeze(-1).to(dtype=dtype)  # (B,S,1)
 
-        # --- 2) 音频专家输入：把同一时间步的各个 codebook 融合成一个向量 ---
-        # audio_tokens: (B, S, num_cb)
+        # 2) Fuse codebooks per timestep for audio expert; non-audio steps masked next
         audio_embeds = self._embed_audio_tokens(tokens)
-        # audio_stream_mask: (B, S, num_cb, 1)
         audio_stream_mask = tokens_mask[:, :, :-1].unsqueeze(-1).to(dtype=dtype)
-        # 融合得到 (B,S,D)；非音频帧处会在下一步被 audio_step_mask 屏蔽
         audio_input = (audio_embeds * audio_stream_mask).sum(dim=2)  # (B,S,D)
 
-        # 过音频专家（带 KV cache 的增量前向）
         h_audio = self.audio_understanding_expert(audio_input, input_pos=input_pos, input_pos_maxp1=input_pos_maxp1).to(dtype=dtype)  # (B,S,D)
-        # --- 3) 文本嵌入（直接来自 backbone 的 token embedding）---
+        # 3) Text embeddings from backbone
         text_embeds = self.backbone.transformer.wte(tokens[:, :, -1])  # (B,S,D)
 
-        # --- 4) 重组统一序列作为 backbone 的输入 ---
+        # 4) Unified backbone input
         backbone_input = h_audio * audio_step_mask + text_embeds * text_step_mask  # (B,S,D)
-        # --- 5) LLM backbone 增量前向，取最后一个时间步隐状态 ---
+        # 5) LLM backbone incremental forward; take last timestep
         h = self.backbone(backbone_input, input_pos=input_pos, input_pos_maxp1=input_pos_maxp1).to(dtype=dtype)  # (B,S,D)
-        # 进入 audio generation expert
-        generation_input = h * audio_step_mask  
+        generation_input = h * audio_step_mask
         h_audio = self.audio_generation_expert(generation_input, input_pos=input_pos, input_pos_maxp1=input_pos_maxp1)
 
-        h_final = h_audio*audio_step_mask + h*text_step_mask # recover the text features
+        h_final = h_audio * audio_step_mask + h * text_step_mask  # recover text features
 
         last_h = h_final[:, -1, :]  # (B,D)
-        # 文本 head 采样（保持你原先流程：每帧先出一个 text token）
+        # Text head: sample one text token per frame first
         text_logits  = self.backbone.lm_head(last_h)  # (B,V_text)
         if cfg_scale > 1.0 and B > 1:
             logits_c0 = text_logits[1:,:] + (text_logits[0:1,:]-text_logits[1:,:])*cfg_scale
