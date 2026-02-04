@@ -1,11 +1,16 @@
-# UniAudio 2.0
+<p align="center">
+    <a href="https://dongchaoyang.top/UniAudio2Demo/">Demo 🎶</a> &nbsp;|&nbsp; 📑 <a href="">Paper</a>
+    <br>
+    <a href="https://huggingface.co/Dongchao/UniAudio2_ckpt">Checkpoints 🤗</a> 
+    </picture></a>
+    <br>
+</p>
 
-UniAudio 2.0: A Unified Audio Language Model with Text-Aligned Factorized Audio Tokenization
+---
 
-## Overview
+# UniAudio 2.0: A Unified Audio Language Model with Text-Aligned Factorized Audio Tokenization
 
 UniAudio 2.0 is a unified audio foundation model for speech, sound, and music. It uses ReasoningCodec (reasoning tokens and reconstruction tokens) and a unified autoregressive architecture trained on 100B text and 60B audio tokens.
-
 The overview of UniAudio 2.0 as following picture shows.
 ![The overview of UniAudio 2.0](fig/overview.png)
 
@@ -17,22 +22,12 @@ The overview of UniAudio 2.0 as following picture shows.
 - Multi-stage training and multi-task data
 - Strong in-domain and few-shot/zero-shot performance
 
-## Supported Tasks (included but not limited to the following representative tasks)
+## Supported Tasks (included but not limited to the following tasks)
 
 - Speech: TTS (EN/ZH/Yue), Audio-Instructed TTS, InstructTTS, ASR, Dysarthric Speech Recognition, S2S Q&A, S2T Q&A
 - Sound: Text-to-Sound, Audio Caption, audio-question answer
 - Music: Song Generation (EN/ZH) and Recognition, Text-to-Music Generation, music-question answer
 
-
-## Demo
-
-We provide an online demo with audio samples for speech, sound, and music tasks:
-
-- **[UniAudio 2.0 Demo](https://dongchaoyang.top/UniAudio2Demo/)** — listen to samples.
-
-## Paper
-
-Paper link to be added.
 
 ## Installation
 
@@ -57,9 +52,9 @@ All tasks are run via **`multi_task_inference.py`**. You need to prepare:
 
 - download the checkpoints from HuggingFace https://huggingface.co/Dongchao/UniAudio2_ckpt
 
-- update the tools/tokenizer/ReasoningCodec_film/codec_infer_config.yaml, put the right path based on your download model path
+- update the **`tools/tokenizer/ReasoningCodec_film/codec_infer_config.yaml`**, use the right path based on your download model path
 
-- run the following code to test different tasks
+- run the following code (refer to **`test.sh`**) to test different tasks
 
 - Note that, we donot use text instruction data to train this model, so the instruction understanding ability may limited. You can change your prompt to adjust it if you are not satisfaction the performance. 
 

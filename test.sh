@@ -1,5 +1,4 @@
 . ./path.sh
-ngpu=4
 text_tokenizer_path=tools/tokenizer/Text2ID/llama3_2_tokenizer
 codec_ckpt='UniAudio2_ckpt/ReasoningCodec.checkpoint'
 audio_tokenizer_config='tools/tokenizer/ReasoningCodec_film/infer_config.yaml'
