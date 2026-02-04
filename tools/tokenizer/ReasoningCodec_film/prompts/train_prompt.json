@@ -1,0 +1,209 @@
+{
+    "asr": [
+        "<Speech><SpeechHere></Speech> Can you transcribe the speech into a written format?",
+        "<Speech><SpeechHere></Speech> Listen to the speech and write down its content.",
+        "<Speech><SpeechHere></Speech> What is the content of the speech you heard?",
+        "<Speech><SpeechHere></Speech> Please write down the transcription of the speech.",
+        "<Speech><SpeechHere></Speech> Please transcribe the speech into a written format.",
+        "<Speech><SpeechHere></Speech> Write down the content of the speech you heard.",
+        "<Speech><SpeechHere></Speech> Can you write down the transcription of the speech?",
+        "<Speech><SpeechHere></Speech> Put the speech into a written format.",
+        "<Speech><SpeechHere></Speech> Please help me to transcribe the speech into a written format.",
+        "<Speech><SpeechHere></Speech> Recognize the content of the speech you heard.",
+        "<Speech><SpeechHere></Speech> Can you recognize what you heard in the speech?",
+        "<Speech><SpeechHere></Speech> Recognize the speech and write it down in a written format.",
+        "<Speech><SpeechHere></Speech> Listen to the speech and recognize its content.",
+        "<Speech><SpeechHere></Speech> Give me the transcription of the speech you heard.",
+        "<Speech><SpeechHere></Speech> Recognize the speech and give me the transcription."
+    ],
+    "asr_zh": [
+        "<Speech><SpeechHere></Speech> 前面的语音说了什么？",
+        "<Speech><SpeechHere></Speech> 请将语音中的内容写下来。",
+        "<Speech><SpeechHere></Speech> 请识别这段中文语音。",
+        "<Speech><SpeechHere></Speech> 听前面的音频，写出对方说的内容。",
+        "<Speech><SpeechHere></Speech> 写下你听到的内容。",
+        "<Speech><SpeechHere></Speech> 请记下语音中人说的话。",
+        "<Speech><SpeechHere></Speech> 仔细听这段语音，记下语音中的话",
+        "<Speech><SpeechHere></Speech> 将你听到的话写下来",
+        "<Speech><SpeechHere></Speech> 这个人说了什么？请记下来。",
+        "<Speech><SpeechHere></Speech> 请将语音转换为文字",
+        "<Speech><SpeechHere></Speech> 请识别这个人说的内容"
+    ],
+    "asr_de": [
+        "<Speech><SpeechHere></Speech> Können Sie die Rede in ein schriftliches Format übertragen?",
+        "<Speech><SpeechHere></Speech> Hören Sie sich die Rede an und schreiben Sie ihren Inhalt auf.",
+        "<Speech><SpeechHere></Speech> Bitte notieren Sie die Transkription der Rede.",
+        "<Speech><SpeechHere></Speech> Geben Sie mir die Transkription der Rede, die Sie gehört haben.",
+        "<Speech><SpeechHere></Speech> Was hat dieser Mann gesagt? Bitte schreiben Sie es auf.",
+        "<Speech><SpeechHere></Speech> Können Sie die Transkription der Rede aufschreiben?",
+        "<Speech><SpeechHere></Speech> Hören Sie der Stimme aufmerksam zu und notieren Sie die Wörter in der Stimme",
+        "<Speech><SpeechHere></Speech> Schreiben Sie auf, was Sie hören.",
+        "<Speech><SpeechHere></Speech> Bitte Sprache in Text umwandeln.",
+        "<Speech><SpeechHere></Speech> Erkennen Sie den Inhalt der Rede, die Sie gehört haben."
+    ],
+    "translation_ec": [
+        "<Speech><SpeechHere></Speech> Can you translate the speech into Chinese?",
+        "<Speech><SpeechHere></Speech> Please translate the speech you heard into Chinese.",
+        "<Speech><SpeechHere></Speech> Listen to the speech and translate it into Chinese.",
+        "<Speech><SpeechHere></Speech> Give me the Chinese translation of this speech.",
+        "<Speech><SpeechHere></Speech> Could you please provide a Chinese translation for the speech?",
+        "<Speech><SpeechHere></Speech> Would you be willing to translate the speech into Chinese for me?",
+        "<Speech><SpeechHere></Speech> Would you be able to render the speech in Chinese?",
+        "<Speech><SpeechHere></Speech> Could you assist me in translating the speech into Chinese?",
+        "<Speech><SpeechHere></Speech> Can you help me convert the speech into Chinese text?",
+        "<Speech><SpeechHere></Speech> Please convert the speech into Chinese text.",
+        "<Speech><SpeechHere></Speech> 请将这段语音的内容翻译成中文。",
+        "<Speech><SpeechHere></Speech> 你能把这段语音用中文表达出来吗？",
+        "<Speech><SpeechHere></Speech> 请将你听到的语音用中文写出来。"
+    ],
+    "audiocaption": [
+        "<Speech><SpeechHere></Speech> Listen to this audio clip and provide its caption.",
+        "<Speech><SpeechHere></Speech> Describe the following audio in a caption.",
+        "<Speech><SpeechHere></Speech> Based on the sound you hear, create a caption for this audio.",
+        "<Speech><SpeechHere></Speech> Can you describe the scene or event depicted in this audio?",
+        "<Speech><SpeechHere></Speech> Could you summarise what's happening in this audio?",
+        "<Speech><SpeechHere></Speech> What does this audio describe?",
+        "<Speech><SpeechHere></Speech> Please describe the audio."
+    ],
+    "audiocaption_v2": [
+        "<Speech><SpeechHere></Speech> Please write down what your hear in the audio."
+    ],
+    "QA": [
+        "<Speech><SpeechHere></Speech> {}"
+    ],
+    "inference_QA": [
+        "<Speech><SpeechHere></Speech> {}"
+    ],
+    "gender_QA": [
+        "<Speech><SpeechHere></Speech> {}"
+    ],
+    "gender_recognition": [
+        "<Speech><SpeechHere></Speech> What is the gender of the speaker?",
+        "<Speech><SpeechHere></Speech> Use one word to describe the speaker's gender.",
+        "<Speech><SpeechHere></Speech> Describe the speaker's gender.",
+        "<Speech><SpeechHere></Speech> Can you accurately identify the gender of the speaker?",
+        "<Speech><SpeechHere></Speech> Can you distinguish the gender of the speaker?",
+        "<Speech><SpeechHere></Speech> Describe the gender of the person speaking.",
+        "<Speech><SpeechHere></Speech> What is the speaker's gender based on the audio?",
+        "<Speech><SpeechHere></Speech> Tell me about the gender of the person you hear.",
+        "<Speech><SpeechHere></Speech> Is the speaker male or female?"
+    ],
+    "phone_recognition": [
+        "<Speech><SpeechHere></Speech> Please transcribe the audio clip into its corresponding phonetic representation.",
+        "<Speech><SpeechHere></Speech> Write the sequence of phonemes corresponding to this speech.",
+        "<Speech><SpeechHere></Speech> Provide the phonetic transcription for the speech.",
+        "<Speech><SpeechHere></Speech> Transcribe the phonemes for the speech please.",
+        "<Speech><SpeechHere></Speech> Can you recognize the phonetic representation in the speech?",
+        "<Speech><SpeechHere></Speech> Listen to the speech and recognize its phonetic representation",
+        "<Speech><SpeechHere></Speech> What is the phoneme transcription of the speech?"
+    ],
+    "speech_separation": [
+        "<Speech><SpeechHere></Speech> There are two people talking in the audio, please write what they say in order.",
+        "<Speech><SpeechHere></Speech> Please write down what you hear each person says.",
+        "<Speech><SpeechHere></Speech> Can you record what each person says?",
+        "<Speech><SpeechHere></Speech> Transcribe the words spoken by each person in the audio."
+    ],
+    "emotion_recognition": [
+        "<Speech><SpeechHere></Speech> Describe the emotion of the speaker in one word.",
+        "<Speech><SpeechHere></Speech> Use one word to describe the speaker's emotion."
+    ],
+    "emotion_recognitions": [
+        "<Speech><SpeechHere></Speech> Describe the emotion of the speaker in one word.",
+        "<Speech><SpeechHere></Speech> Use one word to describe the speaker's emotion."
+    ],
+    "music_caption": [
+        "<Speech><SpeechHere></Speech> Listen to this music clip and describe the music.",
+        "<Speech><SpeechHere></Speech> Please describe the music.",
+        "<Speech><SpeechHere></Speech> Provide a description of the music.",
+        "<Speech><SpeechHere></Speech> Analyze the music in this clip and offer a description.",
+        "<Speech><SpeechHere></Speech> Give me a description of the music in this clip."
+    ],
+    "lyric_recognize": [
+        "<Speech><SpeechHere></Speech> Listen to the music and write down music's lyric.",
+        "<Speech><SpeechHere></Speech> What is the lyric of the music you heard?",
+        "<Speech><SpeechHere></Speech> Please write down the lyric of the music.",
+        "<Speech><SpeechHere></Speech> Write down the lyric of the music you heard.",
+        "<Speech><SpeechHere></Speech> Recognize the lyric of the music you heard.",
+        "<Speech><SpeechHere></Speech> Recognize the music and give me the lyric."
+    ],
+    "speaker_verification": [
+        "<Speech><SpeechHere></Speech> Are the two people speaking successively the same person? Answer yes or no.",
+        "<Speech><SpeechHere></Speech> Do you only hear the same person talking? Answer yes or no.",
+        "<Speech><SpeechHere></Speech> Is only one person speaking in the audio? Answer yes or no."
+    ],
+    "audio_story_telling": [
+        "<Speech><SpeechHere></Speech> Based on the audio, write a story in detail. Your story should be highly related to the audio.",
+        "<Speech><SpeechHere></Speech> Please write a story in detail based on the audio. Your story should contain all the elements in the audio.",
+        "<Speech><SpeechHere></Speech> Please generate a long story that is highly related to the audio."
+    ],
+    "speaker_diarization_asr": [
+        "<Speech><SpeechHere></Speech> Identify each speaker in turn and what is said.",
+        "<Speech><SpeechHere></Speech> Write down the content of each speaker and the corresponding speech in turn.",
+        "<Speech><SpeechHere></Speech> Please recognize each speaker and transcribe their speech content."
+    ],
+    "acoustic_classification": [
+        "<Speech><SpeechHere></Speech> Describe the acoustic scene of the audio in one word.",
+        "<Speech><SpeechHere></Speech> Use one word to describe the the acoustic scene."
+    ],
+    "music_type_classification": [
+        "<Speech><SpeechHere></Speech> Describe the music type of the music in one word. Choose from ['reggae', 'disco', 'rock', 'metal', 'blues', 'classical', 'country', 'hiphop', 'jazz', 'pop']"
+    ],
+    "VocalSound_classification": [
+        "<Speech><SpeechHere></Speech> Listen the audio, and describe the vocal sound type. Choose from [laughter, sighs, coughs, throat clearing, sneezes, sniffs]."
+    ],
+    "zerospeech_recognition": [
+        "<Speech><SpeechHere></Speech> Listen the audio, judge whether the audio is mute or not. Answer Yes or No"
+    ],
+    "speech_caption": [
+        "<Speech><SpeechHere></Speech> Listen the speech, describe it's timbre, speaking speed, style.",
+        "<Speech><SpeechHere></Speech> Listen to this speech and provide its caption (timbre, speaking speed, style, and so on).",
+        "<Speech><SpeechHere></Speech> Describe the following speech in a caption ((timbre, speaking speed, style, and so on))."
+    ],
+    "music_analysis": [
+        "<Speech><SpeechHere></Speech> Listen carefully to the song. Identify: (1) main genre, (2) vocal gender & timbre, (3) instrumentation, (4) lyric, (5) mood progression.",
+        "<Speech><SpeechHere></Speech> Please analyse the audio as a musical piece. Report the singer’s voice type, dominant instruments, tempo/BPM, key or mode, and summarise the lyric content.",    
+        "<Speech><SpeechHere></Speech> After listening, give a detailed breakdown: lyric, style (e.g., pop, jazz), vocalist identity clues (gender, age range), production quality, emotional tone.",
+        "<Speech><SpeechHere></Speech> Evaluate this music clip. Describe the genre, arrangement (rhythm section, melodic instruments), vocal technique, recording ambience, and provide the lyric summary."
+    ],
+    "speech_analysis": [
+        "<Speech><SpeechHere></Speech> Listen the speech, and tell us the speech's transcription, speaker information, emation information, and so on.",
+        "<Speech><SpeechHere></Speech> Listen to the spoken audio. Output: full transcription, speaker count & gender, speech rate (fast/medium/slow), emotional tone...",
+        "<Speech><SpeechHere></Speech> Analyse this speech clip: transcribe it, classify emotion (e.g., calm, excited), describe prosody features (pauses, emphasis), and estimate speaker gender."
+    ],
+    "audio_caption": [
+        "<Speech><SpeechHere></Speech> Listen to this audio clip and provide its caption.",
+        "<Speech><SpeechHere></Speech> Describe the following audio in a caption.",
+        "<Speech><SpeechHere></Speech> Based on the sound you hear, create a caption for this audio.",
+        "<Speech><SpeechHere></Speech> Can you describe the scene or event depicted in this audio?",
+        "<Speech><SpeechHere></Speech> Could you summarise what's happening in this audio?",
+        "<Speech><SpeechHere></Speech> What does this audio describe?",
+        "<Speech><SpeechHere></Speech> Please describe the audio."
+    ],
+    "audio caption": [
+        "<Speech><SpeechHere></Speech> Listen to this audio clip and provide its caption.",
+        "<Speech><SpeechHere></Speech> Describe the following audio in a caption.",
+        "<Speech><SpeechHere></Speech> Based on the sound you hear, create a caption for this audio.",
+        "<Speech><SpeechHere></Speech> Can you describe the scene or event depicted in this audio?",
+        "<Speech><SpeechHere></Speech> Could you summarise what's happening in this audio?",
+        "<Speech><SpeechHere></Speech> What does this audio describe?",
+        "<Speech><SpeechHere></Speech> Please describe the audio."
+    ],
+    "speech_reasoning": [
+        "<Speech><SpeechHere></Speech> Provide a multi-level analysis of this speech: Identify basic audio properties, Analyse phonetic structure and prosody, Transcribe the speech and extract key semantics.."
+    ],
+    "sound_reasoning": [
+        "<Speech><SpeechHere></Speech> Provide a fine-grained reasoning analysis for this sound: Level1: Coarse / Surface. Level 2: Event / Acoustic; Level 3:Semantic"
+    ],
+    "music_reasoning": [
+        "<Speech><SpeechHere></Speech> Provide a fine-grained understanding for this music: e.g. Audio quality, Genre family, Main instruments / presence of vocals, Musical / Acoustic, Semantic / Expressive"
+    ],
+    "music_3level": [
+        "<Speech><SpeechHere></Speech> Perform a three-level music analysis: Level1 (Audio quality, Genre, Instruments/Vocals), Level2 (Tempo, Key, Meter, Melody, Timbre, Dynamics), Level3 (Mood, Lyrics, Techniques, Hook, Structure)"
+    ],
+    "sound_3level": [
+        "<Speech><SpeechHere></Speech> Conduct three-level soundscape analysis: Level1 (Scene type, Spectral band), Level2 (Events, Patterns, Acoustics, Localization), Level3 (Sources, Emotion, Interactions)"
+    ],
+    "speech_3level": [
+        "<Speech><SpeechHere></Speech> Conduct three-level speech analysis: Level1 (Audio quality, Speaker gender, Language), Level2 (Prosody, Rhythm, Pronunciation), Level3 (Transcription, Semantics, Emotion)"
+    ]
+}
