@@ -54,6 +54,8 @@ All tasks are run via **`multi_task_inference.py`**. You need to prepare:
 
 - Note that, we train two version codec (codebook size=1024, and codebook size=8192 (reasoning branch is 4096)). Our currently LLM support the 8192 version (**`ReasoningCodec.checkpoint`**). The **`ReasoningCodec_1024.checkpoint`** version can be used as reconstruction task comparison with other models.
 
+- For the LLM checkpoints, we recommend to use **`llm_ep2.checkpoint`** or **`llm_ep3.checkpoint`**. 
+
 - Update the **`tools/tokenizer/ReasoningCodec_film/codec_infer_config.yaml`**, use the right path based on your download model path
 
 - Run the following code (refer to **`test.sh`**) to test different tasks
@@ -118,6 +120,7 @@ python multi_task_inference.py \
 
 **Text-to-Music (TTM)**  
 Same pattern with `--task TTM` and e.g. `--text "A classical waltz on glass harp."` and `--prompt_text "text-to-music generation"`.
+Our model also support text-to-song generation, but it can only support 30s song generation. If you want to use better song generation performance, please refer to our <a href="https://heartmula.github.io/"> HeartMula</a> 
 
 **Stages**  
 - `--stage all`: run LLM to get tokens, then decode to wav (default).  
