@@ -1,5 +1,5 @@
 <p align="center">
-    <a href="https://dongchaoyang.top/UniAudio2Demo/">Demo 🎶</a> &nbsp;|&nbsp; 📑 <a href="">Paper</a>
+    <a href="https://dongchaoyang.top/UniAudio2Demo/">Demo 🎶</a> &nbsp;|&nbsp; 📑 <a href="https://arxiv.org/pdf/2602.04683">Paper</a>
     <br>
     <a href="https://huggingface.co/Dongchao/UniAudio2_ckpt">Checkpoints 🤗</a> 
     </picture></a>
@@ -52,9 +52,11 @@ All tasks are run via **`multi_task_inference.py`**. You need to prepare:
 
 - download the checkpoints from HuggingFace https://huggingface.co/Dongchao/UniAudio2_ckpt
 
-- update the **`tools/tokenizer/ReasoningCodec_film/codec_infer_config.yaml`**, use the right path based on your download model path
+- Note that, we train two version codec (codebook size=1024, and codebook size=8192 (reasoning branch is 4096)). Our currently LLM support the 8192 version (**`ReasoningCodec.checkpoint`**). The **`ReasoningCodec_1024.checkpoint`** version can be used as reconstruction task comparison with other models.
 
-- run the following code (refer to **`test.sh`**) to test different tasks
+- Update the **`tools/tokenizer/ReasoningCodec_film/codec_infer_config.yaml`**, use the right path based on your download model path
+
+- Run the following code (refer to **`test.sh`**) to test different tasks
 
 - Note that, we donot use text instruction data to train this model, so the instruction understanding ability may limited. You can change your prompt to adjust it if you are not satisfaction the performance. 
 

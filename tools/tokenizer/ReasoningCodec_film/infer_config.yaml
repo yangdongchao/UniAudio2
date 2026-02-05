@@ -36,7 +36,7 @@ transformer_diffusion_config: uniaudio2_ckpt/model_config.json
 sq_config: uniaudio2_ckpt/sqcodec_config.yaml
 sq_resume: uniaudio2_ckpt/sqcodec.pth
 whisper_path: uniaudio2_ckpt/whisper-medium
-reason_lm_path: uniaudio2_ckpt/audiothinker.pth
+reason_lm_path: none
 llm_path: none
 reconstruction_path: none
 prompt_path: uniaudio2_ckpt/prompt.json

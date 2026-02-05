@@ -301,7 +301,7 @@ class AudioDiffusion1D(nn.Module):
 
         '''For the audio thinking part'''
         self.audio_thinking = AudioThinking(dim=self.codec_dim, interval=5, encoder_depth=5, whisper_fea_dim=self.whisper_fea_dim, llm_path=llm_path, prompt_path=prompt_path, use_detokenizer=use_detokenizer, is_train=is_train)
-        self.load_parameter_audio_thinking(reason_lm_path) # load pre-trained model
+        # self.load_parameter_audio_thinking(reason_lm_path) # load pre-trained model
         for param in self.audio_thinking.parameters(): # fix the audio thinker
             param.requires_grad = False
         self.end_sym = '<|end_of_text|>'
