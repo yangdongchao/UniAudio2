@@ -138,28 +138,6 @@ Instead of `--prompt_text`, you can use a JSON that maps task names to prompt li
 See `prompts/audio_tasks_prompts.json` for the expected keys (e.g. `ASR`, `TTS`, `audio_caption`, `speech_s2t`).
 
 
-### The Journey Toward Unified Audio Foundation Models
-
-**2023.05–10 · UniAudio**  
-- 2023.05: Validated global–local transformer in TTS & VC  
-- 2023.06: Collaborated with Jinchuan on universal audio generation framework  
-- 2023.10: Released UniAudio  
-
-**2024.01 · SimpleSpeech**  
-- Laid the foundation for ReasoningCodec  
-
-**2024.06 · UniAudio 1.5**  
-- Built universal audio understanding & generation framework  
-
-**2024.08 · SimpleSpeech 2**
-
-**2025.01 · ALMTokenizer**  
-- Foundation for ReasoningCodec & HeartCodec  
-
-**2026.02 · UniAudio 2.0**  
-- Unified audio foundation model for text, speech, sound, and music
-
-
 ## Acknowledgements
 
 I am deeply grateful to all co-authors and collaborators of the UniAudio series for their collaboration, trust, and inspiring discussions.  
