@@ -139,24 +139,36 @@ See `prompts/audio_tasks_prompts.json` for the expected keys (e.g. `ASR`, `TTS`,
 
 ### The Journey Toward Unified Audio Foundation Models
 
-### 2023.05–10: UniAudio
-- 2023.05: Validated the effectiveness of global-local transformer in TTS and VC tasks  
+**2023.05–10: UniAudio**
+
+- 2023.05: Validated the effectiveness of global-local transformer in TTS and VC tasks 
+
 - 2023.06: Collaborated with Jinchuan to build the universal audio generation framework  
+
 - 2023.10: Released **UniAudio**
 
-### 2024.01: Release SimpleSpeech
+**2024.01: Release SimpleSpeech**
+
 - Laid the foundation for ReasoningCodec
 
-### 2024.06: Release UniAudio 1.5
+**2024.06: Release UniAudio 1.5**
+
 - Built a universal audio understanding and generation framework
 
-### 2024.08: Release SimpleSpeech 2
+**2024.08: Release SimpleSpeech 2**
 
-### 2025.01: Release ALMTokenizer
+**2025.01: Release ALMTokenizer**
+
 - Laid the foundation for ReasoningCodec and HeartCodec
 
-### 2026.02: Release UniAudio 2.0
+**2026.02: Release UniAudio 2.0**
+
 - A unified audio foundation model for text, speech, sound, and music
+
+## Acknowledgements
+
+I am deeply grateful to all co-authors and collaborators of the UniAudio series for their collaboration, trust, and inspiring discussions.  
+Their contributions across modeling, datasets, training infrastructure, and evaluation have been fundamental to the development of UniAudio series.
 
 
 ## Citation
